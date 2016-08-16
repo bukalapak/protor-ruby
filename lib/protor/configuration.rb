@@ -1,14 +1,14 @@
 module Protor
   class Configuration
     attr_writer :host, :port, :max_packet_size
-    attr_accessor :max_udp_packet_size
+    attr_accessor :max_packet_size
 
     def host
       @host ||= 'localhost'
     end
 
     def port
-      @port ||= 10602
+      @port ||= 10601
     end
 
     def max_packet_size
