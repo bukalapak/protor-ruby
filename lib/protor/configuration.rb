@@ -1,7 +1,6 @@
 module Protor
   class Configuration
     attr_writer :host, :port, :max_packet_size
-    attr_accessor :max_packet_size
 
     def host
       @host ||= 'localhost'
