@@ -1,7 +1,6 @@
 PATH
   remote: .
   specs:
-    protor (0.0.1)
 
 GEM
   remote: https://rubygems.org/

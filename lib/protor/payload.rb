@@ -81,7 +81,7 @@ module Protor
     end
 
     def intersect(a, b)
-      a.keep_if{ |k, v| b.key? k }
+      a.keep_if{ |k, v| b[k] == v }
     end
 
     def exclude_common(labels)
