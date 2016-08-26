@@ -20,7 +20,7 @@ class << Protor
 
   def publish
     synchronize do
-      unless @registry.empty?
+      unless registry.empty?
         client.publish(registry)
         reset
       end
