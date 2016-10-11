@@ -1,6 +1,8 @@
+require 'logger'
+
 module Protor
   class Configuration
-    attr_writer :host, :port, :max_packet_size
+    attr_writer :host, :port, :max_packet_size, :logger
 
     def host
       @host ||= 'localhost'
@@ -12,6 +14,10 @@ module Protor
 
     def max_packet_size
       @max_packet_size ||= 56_607
+    end
+
+    def logger
+      @logger ||= Logger.new(STDOUT)
     end
   end
 end
