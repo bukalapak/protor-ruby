@@ -13,6 +13,24 @@ describe Protor::Payload do
     end
   end
 
+  describe 'labels' do
+    before do
+      subject.add(metric)
+    end
+
+    context 'normal usage' do
+      let(:metric) { { metric_name: 'a', labels: { a: 'a', b: 'b' }, value: 1, type: 'a' } }
+
+      it{ expect(subject.to_s).to eql "a=a;b=b\na|a|1\n" }
+    end
+
+    context 'nil value' do
+      let(:metric) { { metric_name: 'a', labels: { a: '', b: nil, c: 'c' }, value: 1, type: 'a' } }
+
+      it{ expect(subject.to_s).to eql "c=c\na|a|1\n" }
+    end
+  end
+
   describe 'additional' do
     let(:metric1){ { metric_name: 'a', additional: [1,2,3], labels: {}, value: 1, type: 'observer', first: true } }
     let(:metric2){ { metric_name: 'a', additional: [1,2,3], labels: {}, value: 1, type: 'observer', first: false } }

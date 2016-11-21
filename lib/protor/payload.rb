@@ -13,6 +13,7 @@ module Protor
     def add(data)
       data = data.dup
       data[:first] = true if lines.empty?
+      data[:labels].delete_if{ |k, v| v.to_s.empty? } if data[:labels]
 
       return false if packet_overflow?(data)
 
@@ -51,7 +52,7 @@ module Protor
     def common_labels=(labels = {})
       @common_labels ||= labels.dup
       intersect(common_labels, labels)
-      @common_labels.keep_if{ |k, v| labels.key? k }
+      @common_labels.keep_if{ |k, v| labels.key?(k) }
     end
 
     def first_line
