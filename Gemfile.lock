@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    protor (0.0.7)
+    protor (0.0.8)
 
 GEM
   remote: https://rubygems.org/
@@ -50,4 +50,4 @@ DEPENDENCIES
   simplecov
 
 BUNDLED WITH
-   1.12.5
+   1.13.6

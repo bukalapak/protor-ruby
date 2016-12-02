@@ -13,7 +13,12 @@ module Protor
     def add(data)
       data = data.dup
       data[:first] = true if lines.empty?
-      data[:labels].delete_if{ |k, v| v.to_s.empty? } if data[:labels]
+
+      if data[:labels]
+        data[:labels].delete_if{ |k, v| v.to_s.empty? }
+      else
+        data[:labels] = {}
+      end
 
       return false if packet_overflow?(data)
 

@@ -13,6 +13,16 @@ describe Protor::Payload do
     end
   end
 
+  describe 'null' do
+    let(:metric){ { metric_name: 'a', labels: nil, value: 1, type: 'accumulator' } }
+
+    it 'works' do
+      subject.add(metric)
+
+      expect(subject.to_s).to eql "a|a|1\n"
+    end
+  end
+
   describe 'labels' do
     before do
       subject.add(metric)
