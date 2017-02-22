@@ -14,4 +14,8 @@ describe Protor::Registry do
     is_expected.not_to be_empty
     expect{ |b| subject.each(&b) }.to yield_control
   end
+
+  it 'label must be a hash' do
+    expect{ subject.counter('a', 1, true) }.to raise_error(Protor::LabelError)
+  end
 end

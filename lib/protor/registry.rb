@@ -11,14 +11,17 @@ module Protor
     end
 
     def counter(metric_name, value, labels = {})
+      raise LabelError.new('Label must be a Hash') unless labels.is_a? Hash
       counter_data.inc(metric_name, value, labels)
     end
 
     def gauge(metric_name, value, labels = {})
+      raise LabelError.new('Label must be a Hash') unless labels.is_a? Hash
       gauge_data.set(metric_name, value, labels)
     end
 
     def histogram(metric_name, value, labels = {}, buckets = HistogramDefaultBuckets)
+      raise LabelError.new('Label must be a Hash') unless labels.is_a? Hash
       histogram_data.observe(metric_name, value, labels, buckets)
     end
 

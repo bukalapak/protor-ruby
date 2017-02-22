@@ -1,5 +1,6 @@
 require 'monitor'
 
+require_relative 'protor/error'
 require_relative 'protor/configuration'
 require_relative 'protor/client'
 require_relative 'protor/registry'
