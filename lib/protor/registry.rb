@@ -48,7 +48,7 @@ module Protor
     attr_reader :options
 
     def verify_label(label)
-      raise LabelError.new('Label must be a Hash') if label && !label.is_a?(Hash)
+      raise LabelError.new("Need Hash as labels, but found #{label.class.name}") if label && !label.is_a?(Hash)
     end
 
     def counter_data
