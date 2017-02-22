@@ -1,3 +1,6 @@
+## 0.0.9 / 2017-02-22
+* [ENHANCEMENT] Add label validation
+
 ## 0.0.8 / 2016-12-02
 * [BUGFIX] Error when label is nil
 
