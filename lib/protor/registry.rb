@@ -11,17 +11,17 @@ module Protor
     end
 
     def counter(metric_name, value, labels = {})
-      raise LabelError.new('Label must be a Hash') unless labels.is_a? Hash
+      verify_label(labels)
       counter_data.inc(metric_name, value, labels)
     end
 
     def gauge(metric_name, value, labels = {})
-      raise LabelError.new('Label must be a Hash') unless labels.is_a? Hash
+      verify_label(labels)
       gauge_data.set(metric_name, value, labels)
     end
 
     def histogram(metric_name, value, labels = {}, buckets = HistogramDefaultBuckets)
-      raise LabelError.new('Label must be a Hash') unless labels.is_a? Hash
+      verify_label(labels)
       histogram_data.observe(metric_name, value, labels, buckets)
     end
 
@@ -46,6 +46,10 @@ module Protor
     private
 
     attr_reader :options
+
+    def verify_label(label)
+      raise LabelError.new('Label must be a Hash') if label && !label.is_a?(Hash)
+    end
 
     def counter_data
       @counter ||= Accumulator.new(:counter)

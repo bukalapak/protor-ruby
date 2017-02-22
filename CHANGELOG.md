@@ -1,3 +1,6 @@
+## 0.0.10 / 2017-02-22
+* [ENHANCEMENT] Label validation
+
 ## 0.0.9 / 2017-02-22
 * [ENHANCEMENT] Add label validation
 
