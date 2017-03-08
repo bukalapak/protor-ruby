@@ -1,50 +1,73 @@
 require 'monitor'
 
-require_relative 'protor/error'
-require_relative 'protor/configuration'
-require_relative 'protor/client'
+require_relative 'protor/udp_formatter'
+require_relative 'protor/udp_client'
+require_relative 'protor/logger_client'
 require_relative 'protor/registry'
 require_relative 'protor/version'
 
-module Protor
-  extend MonitorMixin
-end
+class Protor
+  include MonitorMixin
 
-class << Protor
-  def configuration
-    @configuration ||= Protor::Configuration.new
-  end
+  DEFAULT_CONFIG = {
+    client: :udp,
+    formatter: :udp,
+    host: 'localhost',
+    port: 10601,
+    packet_size: 56_607
+  }
 
-  def configure
-    yield(configuration)
+  attr_reader :config, :registry
+
+  def initialize(&block)
+    super(&block)
+
+    @config = DEFAULT_CONFIG.dup
+    @registry = Registry.new
+    yield(config) if block_given?
   end
 
   def publish
-    synchronize do
-      unless registry.empty?
-        client.publish(registry)
-        reset
-      end
-    end
+    safely{ client.publish(registry) }
+    logger.debug("publish") if logger
   end
 
   [:counter, :gauge, :histogram].each do |method|
-    define_method method do |*args, &block|
-      synchronize{ registry.public_send(method, *args, &block) }
+    define_method method do |*args|
+      safely{ registry.public_send(method, *args) }
+      logger.debug("#{method} #{args}") if logger
     end
   end
 
   private
 
+  def safely(&block)
+    synchronize(&block)
+  rescue StandardError => err
+    logger.error(err) if logger
+    raise err unless silent
+  end
+
   def client
-    @client ||= Protor::Client.new(configuration)
+    @client ||=
+      case config[:client]
+      when :udp; UDPClient.new(config[:host], config[:port], formatter)
+      when :logger; LoggerClient.new(logger, formatter)
+      end
   end
 
-  def registry
-    @registry || reset
+  def formatter
+    @formatter ||=
+      case config[:formatter]
+      when :udp; UDPFormatter.new(config[:packet_size])
+      end
   end
 
-  def reset
-    @registry = Protor::Registry.new(configuration)
+  def logger
+    config[:logger]
+  end
+
+  def silent
+    config[:silent]
   end
 end

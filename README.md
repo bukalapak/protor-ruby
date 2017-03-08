@@ -16,36 +16,39 @@ bundle install
 It automatically aggregate value
 
 ````ruby
-Protor.counter(:counter, 1, {label1: 1}) # value => 1
-Protor.counter(:counter, 1, {label1: 1}) # value => 2
+protor.counter(:counter, 1, {label1: 1}) # value => 1
+protor.counter(:counter, 1, {label1: 1}) # value => 2
 ````
 ### Gauge
 It automatically replace value
 ````ruby
-Protor.gauge(:gauge, 50) # value 50
-Protor.gauge(:gauge, 20) # value 20
+protor.gauge(:gauge, 50) # value 50
+protor.gauge(:gauge, 20) # value 20
 ````
 
 ### Histogram
 It save all observed values
 ````ruby
-Protor.histogram(:histogram, 10, {label1: 1}, [1,2,3,4]) # observed value [10]
-Protor.histogram(:histogram, 2, {label1: 1}, [1,2,3,4](  # observed value [10,2]
+protor.histogram(:histogram, 10, {label1: 1}, [1,2,3,4]) # observed value [10]
+protor.histogram(:histogram, 2, {label1: 1}, [1,2,3,4](  # observed value [10,2]
 ````
 
 ### Publish
 To publish all saved metrics to aggregator
 ````ruby
-Protor.publish
+protor.publish
 ````
 
 ## Configuration
 To configure protor:
 ````ruby
-Protor.configure do |config|
-  config.host = 'localhost'      # aggregator host, default to localhost
-  config.port = 10601            # aggregator port, default to 10601
-  config.max_packet_size = 56607 # max udp packet buffer, default to 56607
+$protor = Protor.new do |conf|
+  conf[:client] = :udp # valid option :udp and :logger, use :logger to print into a Logger
+  conf[:host] = 'localhost' # prometheus_aggregator host
+  conf[:port] = 10601 # prometheus_aggregator port
+  conf[:logger] = Rails.logger # logger to be used by protor
+  conf[:packet_size] = 56_607 # max udp packet buffer
+  conf[:formatter] = :udp # valid option only :udp, format to send
 end
 ````
 

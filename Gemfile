@@ -11,4 +11,5 @@ group :test do
   gem 'simplecov'
   gem 'rake'
   gem 'rspec'
+  gem 'pry'
 end

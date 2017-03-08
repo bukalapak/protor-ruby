@@ -1,70 +1,84 @@
-require_relative 'payload'
-require_relative 'accumulator'
-require_relative 'observer'
+require_relative 'entry'
+require_relative 'entry_family'
 
-module Protor
+class Protor
   class Registry
-    HistogramDefaultBuckets = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10].freeze
+    attr_reader :families
 
-    def initialize(options)
-      @options = options
+    DEFAULT_BUCKET = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10].freeze
+
+    def initialize
+      @families = {}
     end
 
     def counter(metric_name, value, labels = {})
-      verify_label(labels)
-      counter_data.inc(metric_name, value, labels)
+      labels = stringify(labels)
+      fam = family(metric_name, :counter)
+
+      if (entry = fam[labels])
+        entry.value += value
+      else
+        fam[labels] = Entry.new(metric_name, :c, value, labels)
+      end
     end
 
     def gauge(metric_name, value, labels = {})
-      verify_label(labels)
-      gauge_data.set(metric_name, value, labels)
+      labels = stringify(labels)
+      fam = family(metric_name, :gauge)
+
+      if (entry = fam[labels])
+        entry.value = value
+      else
+        fam[labels] = Entry.new(metric_name, :g, value, labels)
+      end
     end
 
-    def histogram(metric_name, value, labels = {}, buckets = HistogramDefaultBuckets)
-      verify_label(labels)
-      histogram_data.observe(metric_name, value, labels, buckets)
+    def histogram(metric_name, value, labels = {}, buckets = DEFAULT_BUCKET)
+      labels = stringify(labels)
+      fam = family(metric_name, :histogram)
+
+      entry = Entry.new(metric_name, :h, value, labels, buckets)
+      if (array = fam[labels])
+        array << entry
+      else
+        fam[labels] = [ entry ]
+      end
     end
 
     def each
-      payload = Payload.new options.max_packet_size
-      all_data.each do |data|
-        unless payload.add(data)
-          yield payload.to_s
-
-          payload = Payload.new options.max_packet_size
-          payload.add(data)
+      families.each_value do |family|
+        if family.type == :histogram
+          family.each{ |arr| arr.each{ |e| yield(e) }}
+        else
+          family.each{ |e| yield(e) }
         end
       end
-
-      yield payload.to_s
     end
 
     def empty?
-      [@counter, @gauge, @histogram].all?{ |metrics| metrics && metrics.empty? }
+      families.empty?
     end
 
     private
 
-    attr_reader :options
-
-    def verify_label(label)
-      raise LabelError.new("Need Hash as labels, but found #{label.class.name}") if label && !label.is_a?(Hash)
+    def stringify(labels)
+      {}.tap do |h|
+        labels.each{ |k, v| h[k.to_s] = v.to_s }
+      end
     end
 
-    def counter_data
-      @counter ||= Accumulator.new(:counter)
-    end
+    def family(name, type)
+      families[name] ||= EntryFamily.new(name, type)
+      family = families[name]
+      raise IncompatibleTypeError.new(name, family.type, type) if family.type != type
 
-    def gauge_data
-      @gauge ||= Accumulator.new(:gauge)
+      return family
     end
+  end
 
-    def histogram_data
-      @histogram ||= Observer.new(:histogram)
-    end
-
-    def all_data
-      [counter_data.to_a, gauge_data.to_a, histogram_data.to_a].flatten
+  class IncompatibleTypeError < StandardError
+    def initialize(name, previous, now)
+      super("Incompatible type for metric #{name}, previously it was a #{previous}, now it is a #{now}")
     end
   end
 end

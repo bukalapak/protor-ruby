@@ -1,21 +1,28 @@
 require 'protor/registry'
 
-config = Object.new
-def config.max_packet_size; 10; end;
-
 describe Protor::Registry do
-  subject{ described_class.new(config) }
+  subject{ described_class.new }
 
   it 'save all metric' do
-    subject.counter('a', 1)
-    subject.gauge('b', 1)
-    subject.histogram('c', 1)
+    subject.counter('aa', 1, a: 'a')
+    subject.counter('aa', 2, a: 'b')
+    subject.counter('aa', 2, a: 'b')
+    subject.gauge('bb', 1)
+    subject.gauge('bb', 2)
+    subject.histogram('cc', 1, a: 'a')
+    subject.histogram('cc', 2, a: 'b')
+    subject.histogram('cc', 2, a: 'b')
 
     is_expected.not_to be_empty
-    expect{ |b| subject.each(&b) }.to yield_control
+    expect{ |b| subject.each(&b) }.to yield_control.exactly(6).times
   end
 
-  it 'label must be a hash' do
-    expect{ subject.counter('a', 1, true) }.to raise_error(Protor::LabelError)
+  it 'error for inconsistent metric type' do
+    subject.counter('aa', 1)
+    expect{ subject.gauge('aa', 1) }.to raise_error(Protor::IncompatibleTypeError)
+  end
+
+  it 'dont yield anything' do
+    expect{ |b| subject.each(&b) }.not_to yield_control
   end
 end
