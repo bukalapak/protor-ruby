@@ -63,7 +63,10 @@ class Protor
 
     def stringify(labels)
       {}.tap do |h|
-        labels.each{ |k, v| h[k.to_s] = v.to_s }
+        labels.each do |k, v|
+          val = v.to_s
+          h[k.to_s] = val unless val.empty?
+        end
       end
     end
 

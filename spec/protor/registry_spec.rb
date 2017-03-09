@@ -25,4 +25,8 @@ describe Protor::Registry do
   it 'dont yield anything' do
     expect{ |b| subject.each(&b) }.not_to yield_control
   end
+
+  it 'discard nil value' do
+    expect{ subject.counter('aa', 1, a: nil) }.not_to raise_error
+  end
 end

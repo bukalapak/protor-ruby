@@ -1,3 +1,10 @@
+## 0.1.1 / 2017-03-09
+* [ENHANCEMENT] Automatically discard null label
+
+## 0.1.0 / 2017-03-08
+* [ENHANCEMENT] Verify metric name, label name, and label value
+* [ENHANCEMENT] Refactor code
+
 ## 0.0.11 / 2017-02-22
 * [ENHANCEMENT] Humanize error message
 
