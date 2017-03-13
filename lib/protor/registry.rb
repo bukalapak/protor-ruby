@@ -55,6 +55,10 @@ class Protor
       end
     end
 
+    def reset
+      @families = {}
+    end
+
     def empty?
       families.empty?
     end

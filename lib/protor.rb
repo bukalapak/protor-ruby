@@ -28,7 +28,10 @@ class Protor
   end
 
   def publish
-    safely{ client.publish(registry) }
+    safely do
+      client.publish(registry)
+      registry.reset
+    end
     logger.debug("publish") if logger
   end
 

@@ -29,4 +29,11 @@ describe Protor::Registry do
   it 'discard nil value' do
     expect{ subject.counter('aa', 1, a: nil) }.not_to raise_error
   end
+
+  it 'can be resetted' do
+    subject.counter('aa', 1, a: 'a')
+    subject.reset
+
+    is_expected.to be_empty
+  end
 end

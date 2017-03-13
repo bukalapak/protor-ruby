@@ -7,6 +7,7 @@ describe Protor do
     subject{ described_class.new }
 
     it do
+      expect(subject.registry).to receive(:reset)
       expect do
         subject.histogram('aaa', 1)
         subject.counter('bbb', 1)

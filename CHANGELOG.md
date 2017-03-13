@@ -1,3 +1,6 @@
+## 0.1.2 / 2017-03-13
+* [BUGFIX] Reset registry after publish
+
 ## 0.1.1 / 2017-03-09
 * [ENHANCEMENT] Automatically discard null label
 
